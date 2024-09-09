@@ -228,7 +228,7 @@ std::vector<float> ConHexEnv::getFeatures(utils::Rotation rotation /*= utils::Ro
                 vFeatures.push_back((turn_ == Player::kPlayer1 ? 1.0f : 0.0f));
             } else if (channel == 5) {
                 vFeatures.push_back((turn_ == Player::kPlayer2 ? 1.0f : 0.0f));
-            } 
+            }
         }
     }
     return vFeatures;

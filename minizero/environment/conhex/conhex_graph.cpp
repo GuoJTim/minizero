@@ -82,7 +82,6 @@ ConHexGraph::ConHexGraph(int board_size)
 {
     this->board_size_ = board_size;
     this->cellEdges_.resize(board_size_ * board_size_);
-    
     this->mapping_.resize(board_size_ * board_size_, std::vector<int>()); // 0-board_size-1
     // need to be optimized
 
