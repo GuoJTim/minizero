@@ -27,6 +27,11 @@ typedef minizero::env::gomoku::GomokuEnvLoader EnvironmentLoader;
 typedef minizero::env::hex::HexAction Action;
 typedef minizero::env::hex::HexEnv Environment;
 typedef minizero::env::hex::HexEnvLoader EnvironmentLoader;
+#elif CONHEX
+#include "conhex.h"
+typedef minizero::env::conhex::ConHexAction Action;
+typedef minizero::env::conhex::ConHexEnv Environment;
+typedef minizero::env::conhex::ConHexEnvLoader EnvironmentLoader;
 #elif KILLALLGO
 #include "killallgo.h"
 typedef minizero::env::killallgo::KillAllGoAction Action;
@@ -90,6 +95,8 @@ inline void setUpEnv()
     config::env_board_size = 9;
 #elif HEX
     config::env_board_size = 11;
+#elif CONHEX
+    config::env_board_size = 9;
 #elif KILLALLGO
     config::env_board_size = 7;
 #elif OTHELLO
