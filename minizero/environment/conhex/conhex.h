@@ -39,10 +39,10 @@ public:
 
 private:
     bool isPlaceable(int table_id) const;
-    Player updateWinner(int actionID, Player player);
+    Player updateWinner(int action_id, Player player);
     Player winner_;
-    std::vector<Player> board_;
-    ConHexGraph conHexGraph_;
+    ConHexGraph conhex_graph_;
+    const std::array<int, 12> invalid_actions_ = {10, 16, 20, 24, 30, 32, 48, 50, 56, 60, 64, 70};
 };
 
 class ConHexEnvLoader : public BaseBoardEnvLoader<ConHexAction, ConHexEnv> {

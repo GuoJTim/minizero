@@ -22,8 +22,8 @@ if [[ ! $container_tool ]]; then
 	exit 1
 fi
 container_volume="-v .:/workspace"
-container_argumenets="--gpus all"
-record_history=true
+container_argumenets=""
+record_history=false
 while :; do
 	case $1 in
 		-h|--help) shift; usage

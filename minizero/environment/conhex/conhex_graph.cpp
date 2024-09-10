@@ -10,182 +10,113 @@ namespace minizero::env::conhex {
 
 using namespace minizero::utils;
 
-Cell::Cell(int cell_id)
+void ConHexGraph::initGraph()
 {
-    this->cellId_ = cell_id;
-    this->capturePlayer_ = Player::kPlayerNone; // who capture this
-}
-void Cell::addHole(int hole)
-{
-    this->holes_.push_back(std::make_pair(hole, Player::kPlayerNone));
-}
-Player Cell::capture(int hole, Player player) // who capture this
-{
-    for (int idx = 0; idx < static_cast<int>(this->holes_.size()); idx++) {
-        if (this->holes_[idx].first == hole && this->holes_[idx].second == Player::kPlayerNone) {
-            this->holes_[idx].second = player;
-        }
-    }
-    if (this->capturePlayer_ != Player::kPlayerNone) return this->capturePlayer_;
+    addCell({0, 1, 9}, ConHexGraphEdgeFlag::TOP | ConHexGraphEdgeFlag::LEFT);
+    addCell({1, 2, 3}, ConHexGraphEdgeFlag::TOP);
+    addCell({3, 4, 5}, ConHexGraphEdgeFlag::TOP); // move these whole thing to conhex consturctor make this class easier
+    addCell({5, 6, 7}, ConHexGraphEdgeFlag::TOP);
+    addCell({7, 8, 17}, ConHexGraphEdgeFlag::TOP | ConHexGraphEdgeFlag::RIGHT);
+    addCell({17, 26, 35}, ConHexGraphEdgeFlag::RIGHT);
+    addCell({35, 44, 53}, ConHexGraphEdgeFlag::RIGHT);
+    addCell({53, 62, 71}, ConHexGraphEdgeFlag::RIGHT);
+    addCell({71, 79, 80}, ConHexGraphEdgeFlag::RIGHT | ConHexGraphEdgeFlag::BOTTOM);
+    addCell({77, 78, 79}, ConHexGraphEdgeFlag::BOTTOM);
+    addCell({75, 76, 77}, ConHexGraphEdgeFlag::BOTTOM);
+    addCell({73, 74, 75}, ConHexGraphEdgeFlag::BOTTOM);
+    addCell({63, 72, 73}, ConHexGraphEdgeFlag::BOTTOM | ConHexGraphEdgeFlag::LEFT);
+    addCell({45, 54, 63}, ConHexGraphEdgeFlag::LEFT);
+    addCell({27, 36, 45}, ConHexGraphEdgeFlag::LEFT);
+    addCell({9, 18, 27}, ConHexGraphEdgeFlag::LEFT);
+    addCell({1, 2, 9, 11, 18, 19}, ConHexGraphEdgeFlag::NONE);
+    addCell({2, 3, 4, 11, 12, 13}, ConHexGraphEdgeFlag::NONE);
+    addCell({4, 5, 6, 13, 14, 15}, ConHexGraphEdgeFlag::NONE);
+    addCell({6, 7, 15, 17, 25, 26}, ConHexGraphEdgeFlag::NONE);
+    addCell({25, 26, 34, 35, 43, 44}, ConHexGraphEdgeFlag::NONE);
+    addCell({43, 44, 52, 53, 61, 62}, ConHexGraphEdgeFlag::NONE);
+    addCell({61, 62, 69, 71, 78, 79}, ConHexGraphEdgeFlag::NONE);
+    addCell({67, 68, 69, 76, 77, 78}, ConHexGraphEdgeFlag::NONE);
+    addCell({65, 66, 67, 74, 75, 76}, ConHexGraphEdgeFlag::NONE);
+    addCell({54, 55, 63, 65, 73, 74}, ConHexGraphEdgeFlag::NONE);
+    addCell({36, 37, 45, 46, 54, 55}, ConHexGraphEdgeFlag::NONE);
+    addCell({18, 19, 27, 28, 36, 37}, ConHexGraphEdgeFlag::NONE);
+    addCell({11, 12, 19, 21, 28, 29}, ConHexGraphEdgeFlag::NONE);
+    addCell({12, 13, 14, 21, 22, 23}, ConHexGraphEdgeFlag::NONE);
+    addCell({14, 15, 23, 25, 33, 34}, ConHexGraphEdgeFlag::NONE);
+    addCell({33, 34, 42, 43, 51, 52}, ConHexGraphEdgeFlag::NONE);
+    addCell({51, 52, 59, 61, 68, 69}, ConHexGraphEdgeFlag::NONE);
+    addCell({57, 58, 59, 66, 67, 68}, ConHexGraphEdgeFlag::NONE);
+    addCell({46, 47, 55, 57, 65, 66}, ConHexGraphEdgeFlag::NONE);
+    addCell({28, 29, 37, 38, 46, 47}, ConHexGraphEdgeFlag::NONE);
+    addCell({21, 22, 29, 31, 38, 39}, ConHexGraphEdgeFlag::NONE);
+    addCell({22, 23, 31, 33, 41, 42}, ConHexGraphEdgeFlag::NONE);
+    addCell({41, 42, 49, 51, 58, 59}, ConHexGraphEdgeFlag::NONE);
+    addCell({38, 39, 47, 49, 57, 58}, ConHexGraphEdgeFlag::NONE);
+    addCell({31, 39, 40, 41, 49}, ConHexGraphEdgeFlag::NONE);
 
-    int p1 = 0;
-    int p2 = 0;
-    for (int idx = 0; idx < static_cast<int>(this->holes_.size()); idx++) {
-        if (this->holes_[idx].second == Player::kPlayer1) p1++;
-        if (this->holes_[idx].second == Player::kPlayer2) p2++;
-    }
-    // std::cout << "cellid:" << cellId_ << " " << p1 << " " << p2 << std::endl;
-    if (this->holes_.size() >= 5) {
-        if (p1 == 3) this->capturePlayer_ = Player::kPlayer1;
-        if (p2 == 3) this->capturePlayer_ = Player::kPlayer2;
-    } else if (this->holes_.size() == 3) {
-        if (p1 == 2) this->capturePlayer_ = Player::kPlayer1;
-        if (p2 == 2) this->capturePlayer_ = Player::kPlayer2;
-    }
-
-    return this->capturePlayer_;
-}
-
-int Cell::getCellId()
-{
-    return this->cellId_;
-}
-
-void Cell::reset()
-{
-    for (int idx = 0; idx < static_cast<int>(this->holes_.size()); idx++) {
-        this->holes_[idx].second = Player::kPlayerNone;
-    }
-    this->capturePlayer_ = Player::kPlayerNone;
-}
-
-void ConHexGraph::reset()
-{
-    this->sz_.resize(board_size_ * board_size_ + 4, 0);  // +4 stands for top/left/right/bottom
-    this->parent_.resize(board_size_ * board_size_ + 4); // +4 stands for top/left/right/bottom
-    this->cacheBoard_.resize(board_size_ * board_size_);
-    fill(this->cacheBoard_.begin(), this->cacheBoard_.end(), Player::kPlayerNone);
-
-    // DSU reset
-    for (int i = 0; i < board_size_ * board_size_ + 4; i++) {
-        this->parent_[i] = i;
-        this->sz_[i] = 0;
-    }
-
-    // cell reset
-    for (Cell& cell : cell_) {
-        cell.reset();
-    }
-}
-
-ConHexGraph::ConHexGraph(int board_size)
-{
-    this->board_size_ = board_size;
-    this->cellEdges_.resize(board_size_ * board_size_);
-    this->mapping_.resize(board_size_ * board_size_, std::vector<int>()); // 0-board_size-1
-    // need to be optimized
-
-    this->cell_.resize(board_size_ * board_size_); // player
-    this->cell_id_cnt_ = 0;                        // start from 0
-    this->topId_ = board_size_ * board_size_ + 0;
-    this->leftId_ = board_size_ * board_size_ + 1;
-    this->rightId_ = board_size_ * board_size_ + 2;
-    this->bottomId_ = board_size_ * board_size_ + 3;
-    reset();
-}
-/**
- * @brief add Cell
- *
- * @param isTop     closed to the top
- * @param isLeft    closed to the left
- * @param isRight   closed to the right
- * @param isBottom  closed to the bottom
- * @return int      cell_id
- */
-int ConHexGraph::addCell(std::vector<int> hole_idxs, bool isTop, bool isLeft, bool isRight, bool isBottom)
-{
-    int cell_id = cell_id_cnt_++;
-    Cell newCell = Cell(cell_id);
-
-    // add
-    for (auto& hole_idx : hole_idxs) {
-        mapping_[hole_idx].push_back(cell_id);
-        newCell.addHole(hole_idx);
-    }
-
-    newCell.isTop_ = isTop;
-    newCell.isLeft_ = isLeft;
-    newCell.isRight_ = isRight;
-    newCell.isBottom_ = isBottom;
-
-    cell_[cell_id] = newCell;
-    return cell_id;
-}
-
-int ConHexGraph::addOuterCell(int hole_idx_1, int hole_idx_2, int hole_idx_3, bool isTop, bool isLeft, bool isRight, bool isBottom)
-{
-    std::vector<int> hole_idxs({hole_idx_1, hole_idx_2, hole_idx_3});
-    return addCell(hole_idxs, isTop, isLeft, isRight, isBottom);
-}
-
-int ConHexGraph::addInnerCell(int hole_idx_1, int hole_idx_2, int hole_idx_3, int hole_idx_4, int hole_idx_5, int hole_idx_6)
-{
-    std::vector<int> hole_idxs({hole_idx_1, hole_idx_2, hole_idx_3, hole_idx_4, hole_idx_5, hole_idx_6});
-    return addCell(hole_idxs, false, false, false, false);
-}
-
-int ConHexGraph::addCenterCell(int hole_idx_1, int hole_idx_2, int hole_idx_3, int hole_idx_4, int hole_idx_5)
-{
-    std::vector<int> hole_idxs({hole_idx_1, hole_idx_2, hole_idx_3, hole_idx_4, hole_idx_5});
-    return addCell(hole_idxs, false, false, false, false);
-}
-
-void ConHexGraph::cellInnerConnect(int from_cell_id, int to_cell_id)
-{
-    // same as Union in DSU
-    int fa = find(from_cell_id), fb = find(to_cell_id);
-    if (fa == fb) return; // already same
-    if (this->sz_[fa] > this->sz_[fb]) std::swap(fa, fb);
-    this->parent_[fb] = fa;
-    this->sz_[fa] = this->sz_[fb];
-}
-
-void ConHexGraph::selfEdgeConnect()
-{
-    for (int hole_idx = 0; hole_idx < board_size_ * board_size_; hole_idx++) {
-        if (mapping_[hole_idx].size() == 1) continue;
-        if (mapping_[hole_idx].size() == 2) continue; // debug
-        if (mapping_[hole_idx].size() == 3) {
-            int combination[] = {mapping_[hole_idx][0], mapping_[hole_idx][1], mapping_[hole_idx][2]};
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
+    for (int hole_idx = 0; hole_idx < board_size_ * board_size_; ++hole_idx) {
+        if (hole_to_cell_map_[hole_idx].size() == 1) continue;
+        if (hole_to_cell_map_[hole_idx].size() == 2) continue; // debug
+        if (hole_to_cell_map_[hole_idx].size() == 3) {
+            std::array<int, 3> combination = {hole_to_cell_map_[hole_idx][0], hole_to_cell_map_[hole_idx][1], hole_to_cell_map_[hole_idx][2]};
+            for (int i = 0; i < combination.size(); ++i) {
+                for (int j = 0; j < combination.size(); ++j) {
                     if (i == j) continue;
-                    this->cellEdges_[combination[i]].insert(combination[j]);
+                    cell_adjacency_list[combination[i]].insert(combination[j]);
                 }
             }
         }
     }
 }
 
-int ConHexGraph::find(int index)
+void ConHexGraph::addCell(std::vector<int> hole_indexes, ConHexGraphEdgeFlag cell_edge_flag)
 {
-    if (this->parent_[index] == index) return index;
-    return this->parent_[index] = find(this->parent_[index]);
-}
+    int cell_id = cell_id_cnt_++;
+    ConHexGraphCellType cell_type = ConHexGraphCellType::NONE;
+    if (hole_indexes.size() == ConHexGraphCellType::INNER) cell_type = ConHexGraphCellType::INNER;
+    if (hole_indexes.size() == ConHexGraphCellType::OUTER) cell_type = ConHexGraphCellType::OUTER;
+    if (hole_indexes.size() == ConHexGraphCellType::CENTER) cell_type = ConHexGraphCellType::CENTER;
 
-std::vector<std::pair<int, Player>> ConHexGraph::getCellsCapturePlayerByHole(int hole_idx)
-{
-    std::vector<std::pair<int, Player>> ret;
-    for (int cell_id : mapping_[hole_idx]) {
-        ret.push_back(std::make_pair(cell_id, cell_[cell_id].capturePlayer_));
+    assert(cell_type == ConHexGraphCellType::NONE);
+
+    ConHexGraphCell new_cell(cell_id, cell_type);
+
+    new_cell.initHole(hole_indexes);
+    new_cell.setEdgeFlag(cell_edge_flag);
+
+    // add
+    for (auto& hole_index : hole_indexes) {
+        hole_to_cell_map_[hole_index].push_back(cell_id);
     }
-    return ret;
+
+    cell_list_[cell_id] = new_cell;
 }
 
-bool ConHexGraph::cellIsCapturedByPlayer(int cell_id, Player player) const
+ConHexGraph::ConHexGraph(int board_size) : graph_dsu_(board_size), board_size_(board_size)
 {
-    if (cell_id >= static_cast<int>(cell_.size())) return false;
-    return cell_[cell_id].capturePlayer_ == player;
+    cell_adjacency_list = std::vector<std::set<int>>(board_size_ * board_size_, std::set<int>());
+    hole_to_cell_map_ = std::vector<std::vector<int>>(board_size_ * board_size_, std::vector<int>());
+    cell_list_ = std::vector<ConHexGraphCell>(board_size_ * board_size_);
+    cell_id_cnt_ = 0; // start from 0
+    initGraph();
+    reset();
+}
+
+void ConHexGraph::reset()
+{
+    graph_dsu_.reset();
+    board_ = std::vector<Player>(board_size_ * board_size_, Player::kPlayerNone);
+    winner_ = Player::kPlayerNone;
+    // cell reset
+    for (ConHexGraphCell& cell : cell_list_) {
+        cell.reset();
+    }
+}
+
+bool ConHexGraph::isCellCapturedByPlayer(int cell_id, Player player) const
+{
+    if (cell_id >= static_cast<int>(cell_list_.size())) return false;
+    return cell_list_[cell_id].getCapturedPlayer() == player;
 }
 
 std::string ConHexGraph::toString() const
@@ -216,7 +147,7 @@ std::string ConHexGraph::toString() const
      |o |  *  |  *  |  *  | o|
     []-----------------------[]
     */
-    std::string pattern[] = {
+    const static std::array<std::string, 23> pattern = {
         "   A B  C  D  E  F  G  H I",
         " []=======================[]",
         "  lo |  *  |  *  |  *  | ol",
@@ -240,7 +171,6 @@ std::string ConHexGraph::toString() const
         "  lo |  *  |  *  |  *  | ol",
         " []=======================[]",
         "   A B  C  D  E  F  G  H I"};
-    bool debug_color = false;
     std::string colored_red_edge{minizero::utils::getColorText(
         "│", minizero::utils::TextType::kBold, minizero::utils::TextColor::kWhite,
         color_player_2)};
@@ -263,32 +193,9 @@ std::string ConHexGraph::toString() const
     std::string colored_red_node{minizero::utils::getColorText(
         "o", minizero::utils::TextType::kBold, color_player_2,
         minizero::utils::TextColor::kBlack)};
-    if (debug_color) {
-        colored_red_edge = "|";
-        colored_blue_edge = "─";
-        colored_blue_cell = "B";
-        colored_red_cell = "R";
-        colored_blue_node = "b";
-        colored_red_node = "r";
-    }
-    int node_id_mapping[] = {0, 8, 1, 2, 3, 4, 5, 6, 7, 9, 11, 12, 13, 14, 15, 17, 18, 19, 21, 22, 23, 25, 26, 27, 28, 29, 31, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 49, 51, 52, 53, 54, 55, 57, 58, 59, 61, 62, 63, 65, 66, 67, 68, 69, 71, 73, 74, 75, 76, 77, 78, 79, 72, 80};
-    int cell_id_mapping[] = {1, 2, 3,
-                             0, 4,
-                             17, 18,
-                             16, 19,
-                             29,
-                             15, 28, 30, 5,
-                             27, 36, 37, 20,
-                             40,
-                             14, 35, 31, 6,
-                             40,
-                             26, 39, 38, 21,
-                             13, 34, 32, 7,
-                             33,
-                             25, 22,
-                             24, 23,
-                             12, 8,
-                             11, 10, 9};
+
+    constexpr std::array<int, 69> node_id_mapping = {0, 8, 1, 2, 3, 4, 5, 6, 7, 9, 11, 12, 13, 14, 15, 17, 18, 19, 21, 22, 23, 25, 26, 27, 28, 29, 31, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 49, 51, 52, 53, 54, 55, 57, 58, 59, 61, 62, 63, 65, 66, 67, 68, 69, 71, 73, 74, 75, 76, 77, 78, 79, 72, 80};
+    constexpr std::array<int, 42> cell_id_mapping = {1, 2, 3, 0, 4, 17, 18, 16, 19, 29, 15, 28, 30, 5, 27, 36, 37, 20, 40, 14, 35, 31, 6, 40, 26, 39, 38, 21, 13, 34, 32, 7, 33, 25, 22, 24, 23, 12, 8, 11, 10, 9};
     std::string out;
     int cell_id_cnt = 0;
     int node_id_cnt = 0;
@@ -300,16 +207,16 @@ std::string ConHexGraph::toString() const
                 out += colored_red_edge;
             } else if (c == '*') {
                 int cell_id = cell_id_mapping[cell_id_cnt];
-                if (cell_[cell_id].capturePlayer_ == Player::kPlayer1) out += colored_blue_cell;
-                if (cell_[cell_id].capturePlayer_ == Player::kPlayer2) out += colored_red_cell;
-                if (cell_[cell_id].capturePlayer_ == Player::kPlayerNone) out += " ";
+                if (cell_list_[cell_id].getCapturedPlayer() == Player::kPlayer1) out += colored_blue_cell;
+                if (cell_list_[cell_id].getCapturedPlayer() == Player::kPlayer2) out += colored_red_cell;
+                if (cell_list_[cell_id].getCapturedPlayer() == Player::kPlayerNone) out += " ";
 
                 cell_id_cnt += 1;
             } else if (c == 'o') {
                 int node_id = node_id_mapping[node_id_cnt];
-                if (cacheBoard_[node_id] == Player::kPlayer1) out += colored_blue_node;
-                if (cacheBoard_[node_id] == Player::kPlayer2) out += colored_red_node;
-                if (cacheBoard_[node_id] == Player::kPlayerNone) out += "o";
+                if (board_[node_id] == Player::kPlayer1) out += colored_blue_node;
+                if (board_[node_id] == Player::kPlayer2) out += colored_red_node;
+                if (board_[node_id] == Player::kPlayerNone) out += "o";
                 node_id_cnt += 1;
             } else {
                 out += c;
@@ -320,49 +227,55 @@ std::string ConHexGraph::toString() const
     return out; // dont show anything
 }
 
-/**
- * @brief
- *
- * @param hole_idx put on hole_idx
- * @return true  game ended, player win
- * @return false game not end
- */
-Player ConHexGraph::cellCapture(int hole_idx, Player player)
+Player ConHexGraph::getPlayerAtPos(int hole_idx) const
 {
-    Player winner = Player::kPlayerNone;
-    if (cacheBoard_[hole_idx] == Player::kPlayerNone) {
-        cacheBoard_[hole_idx] = player;
-    }
-    for (int cell_id : mapping_[hole_idx]) {
-        Player ret = cell_[cell_id].capture(hole_idx, player);
-        if (ret == Player::kPlayerNone) continue; // no capture action happens
+    return board_[hole_idx];
+}
+
+void ConHexGraph::placeStone(int hole_idx, Player player)
+{
+    assert(board_[hole_idx] != Player::kPlayerNone);
+    board_[hole_idx] = player;
+
+    for (int& cell_id : hole_to_cell_map_[hole_idx]) {
+        // may have many cell on same hole, at most 3 layers (cells)
+        
+        cell_list_[cell_id].placeStone(hole_idx, player);
+        Player cellCapturedPlayer = cell_list_[cell_id].getCapturedPlayer();
+        if (cellCapturedPlayer == Player::kPlayerNone) continue; // no capture action happens
 
         // near edge or not
-        if (ret == Player::kPlayer1 && cell_[cell_id].isTop_) {
-            cellInnerConnect(cell_id, topId_);
+        if (cellCapturedPlayer == Player::kPlayer1 && cell_list_[cell_id].isEdgeFlag(ConHexGraphEdgeFlag::TOP)) {
+
+            graph_dsu_.connect(cell_id, top_id_);
         }
-        if (ret == Player::kPlayer2 && cell_[cell_id].isLeft_) {
-            cellInnerConnect(cell_id, leftId_);
+        if (cellCapturedPlayer == Player::kPlayer2 && cell_list_[cell_id].isEdgeFlag(ConHexGraphEdgeFlag::LEFT)) {
+            graph_dsu_.connect(cell_id, left_id_);
         }
-        if (ret == Player::kPlayer2 && cell_[cell_id].isRight_) {
-            cellInnerConnect(cell_id, rightId_);
+        if (cellCapturedPlayer == Player::kPlayer2 && cell_list_[cell_id].isEdgeFlag(ConHexGraphEdgeFlag::RIGHT)) {
+            graph_dsu_.connect(cell_id, right_id_);
         }
-        if (ret == Player::kPlayer1 && cell_[cell_id].isBottom_) {
-            cellInnerConnect(cell_id, bottomId_);
+        if (cellCapturedPlayer == Player::kPlayer1 && cell_list_[cell_id].isEdgeFlag(ConHexGraphEdgeFlag::BOTTOM)) {
+            graph_dsu_.connect(cell_id, bottom_id_);
         }
 
-        for (int near_id : this->cellEdges_[cell_id]) {
-            if (cell_[near_id].capturePlayer_ == ret) {
-                cellInnerConnect(near_id, cell_id);
+        for (int near_cell_id : cell_adjacency_list[cell_id]) {
+            if (cell_list_[near_cell_id].getCapturedPlayer() == cellCapturedPlayer) {
+                graph_dsu_.connect(near_cell_id, cell_id);
             }
         }
-        if (player == Player::kPlayer1 && find(topId_) == find(bottomId_)) {
-            winner = player;
+        if (player == Player::kPlayer1 && graph_dsu_.find(top_id_) == graph_dsu_.find(bottom_id_)) {
+            winner_ = player;
         }
-        if (player == Player::kPlayer2 && find(leftId_) == find(rightId_)) {
-            winner = player;
+        if (player == Player::kPlayer2 && graph_dsu_.find(left_id_) == graph_dsu_.find(right_id_)) {
+            winner_ = player;
         }
     }
-    return winner;
 }
+
+Player ConHexGraph::checkWinner() const
+{ 
+    return winner_;
+}
+
 } // namespace minizero::env::conhex

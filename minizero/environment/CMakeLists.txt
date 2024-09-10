@@ -6,6 +6,7 @@ target_include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     base
     atari
+    conhex
     connect6
     go
     gomoku
@@ -17,7 +18,6 @@ target_include_directories(
     tictactoe
     stochastic
     stochastic/puzzle2048
-    conhex
 )
 target_link_libraries(
     environment

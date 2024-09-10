@@ -7,6 +7,11 @@
 typedef minizero::env::atari::AtariAction Action;
 typedef minizero::env::atari::AtariEnv Environment;
 typedef minizero::env::atari::AtariEnvLoader EnvironmentLoader;
+#elif CONHEX
+#include "conhex.h"
+typedef minizero::env::conhex::ConHexAction Action;
+typedef minizero::env::conhex::ConHexEnv Environment;
+typedef minizero::env::conhex::ConHexEnvLoader EnvironmentLoader;
 #elif CONNECT6
 #include "connect6.h"
 typedef minizero::env::connect6::Connect6Action Action;
@@ -27,11 +32,6 @@ typedef minizero::env::gomoku::GomokuEnvLoader EnvironmentLoader;
 typedef minizero::env::hex::HexAction Action;
 typedef minizero::env::hex::HexEnv Environment;
 typedef minizero::env::hex::HexEnvLoader EnvironmentLoader;
-#elif CONHEX
-#include "conhex.h"
-typedef minizero::env::conhex::ConHexAction Action;
-typedef minizero::env::conhex::ConHexEnv Environment;
-typedef minizero::env::conhex::ConHexEnvLoader EnvironmentLoader;
 #elif KILLALLGO
 #include "killallgo.h"
 typedef minizero::env::killallgo::KillAllGoAction Action;
@@ -91,12 +91,12 @@ inline void setUpEnv()
 
 #if CONNECT6
     config::env_board_size = 19;
+#elif CONHEX
+    config::env_board_size = 9;
 #elif GO
     config::env_board_size = 9;
 #elif HEX
     config::env_board_size = 11;
-#elif CONHEX
-    config::env_board_size = 9;
 #elif KILLALLGO
     config::env_board_size = 7;
 #elif OTHELLO
