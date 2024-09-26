@@ -28,7 +28,7 @@ private:
 
     DisjointSetUnion graph_dsu_;
     std::vector<std::vector<int>> hole_to_cell_map_; // hole_idx* -> cell_id, on same hole id may have many cell
-    std::vector<std::set<int>> cell_adjacency_list_;  // cell_id -> cell_id* , adj list
+    std::vector<std::set<int>> cell_adjacency_list_; // cell_id -> cell_id* , adj list
 
     std::vector<ConHexGraphCell> cell_list_;
     std::vector<Player> board_;
