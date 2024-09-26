@@ -1,5 +1,5 @@
-#ifndef MINIZERO_ENVIRONMENT_CONHEX_GRAPH_CELL_H_
-#define MINIZERO_ENVIRONMENT_CONHEX_GRAPH_CELL_H_
+#ifndef MINIZERO_ENVIRONMENT_CONHEX_CONHEX_GRAPH_CELL_H_
+#define MINIZERO_ENVIRONMENT_CONHEX_CONHEX_GRAPH_CELL_H_
 #include "base_env.h"
 #include "conhex_graph_flag.h"
 #include <set>
@@ -31,4 +31,4 @@ private:
 };
 
 } // namespace minizero::env::conhex
-#endif // MINIZERO_ENVIRONMENT_CONHEX_GRAPH_CELL_H_
+#endif // MINIZERO_ENVIRONMENT_CONHEX_CONHEX_GRAPH_CELL_H_

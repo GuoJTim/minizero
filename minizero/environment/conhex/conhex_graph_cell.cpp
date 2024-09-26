@@ -60,7 +60,7 @@ void ConHexGraphCell::setEdgeFlag(ConHexGraphEdgeFlag cell_edge_flag)
 
 bool ConHexGraphCell::isEdgeFlag(ConHexGraphEdgeFlag edge_flag)
 {
-    return (bool)(edge_flag_ & edge_flag);
+    return static_cast<bool>(edge_flag_ & edge_flag);
 }
 
 int ConHexGraphCell::getCellId()

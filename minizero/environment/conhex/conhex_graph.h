@@ -1,5 +1,5 @@
-#ifndef MINIZERO_ENVIRONMENT_CONHEX_GRAPH_H_
-#define MINIZERO_ENVIRONMENT_CONHEX_GRAPH_H_
+#ifndef MINIZERO_ENVIRONMENT_CONHEX_CONHEX_GRAPH_H_
+#define MINIZERO_ENVIRONMENT_CONHEX_CONHEX_GRAPH_H_
 #include "base_env.h"
 #include "conhex_graph_cell.h"
 #include "conhex_graph_flag.h"
@@ -28,7 +28,7 @@ private:
 
     DisjointSetUnion graph_dsu_;
     std::vector<std::vector<int>> hole_to_cell_map_; // hole_idx* -> cell_id, on same hole id may have many cell
-    std::vector<std::set<int>> cell_adjacency_list;  // cell_id -> cell_id* , adj list
+    std::vector<std::set<int>> cell_adjacency_list_;  // cell_id -> cell_id* , adj list
 
     std::vector<ConHexGraphCell> cell_list_;
     std::vector<Player> board_;
@@ -43,4 +43,4 @@ private:
 };
 
 } // namespace minizero::env::conhex
-#endif // MINIZERO_ENVIRONMENT_CONHEX_GRAPH_H_
+#endif // MINIZERO_ENVIRONMENT_CONHEX_CONHEX_GRAPH_H_

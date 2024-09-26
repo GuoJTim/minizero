@@ -1,5 +1,5 @@
-#ifndef MINIZERO_ENVIRONMENT_CONHEX_GRAPH_EDGE_FLAG_H_
-#define MINIZERO_ENVIRONMENT_CONHEX_GRAPH_EDGE_FLAG_H_
+#ifndef MINIZERO_ENVIRONMENT_CONHEX_CONHEX_GRAPH_FLAG_H_
+#define MINIZERO_ENVIRONMENT_CONHEX_CONHEX_GRAPH_FLAG_H_
 #include <set>
 #include <string>
 #include <utility>
@@ -48,6 +48,5 @@ inline bool operator==(ConHexGraphCellType a, int b)
     return static_cast<int>(a) == b;
 }
 
-
 } // namespace minizero::env::conhex
-#endif // MINIZERO_ENVIRONMENT_CONHEX_GRAPH_EDGE_FLAG_H_
+#endif // MINIZERO_ENVIRONMENT_CONHEX_CONHEX_GRAPH_FLAG_H_

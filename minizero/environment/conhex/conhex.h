@@ -42,7 +42,7 @@ private:
     Player updateWinner(int action_id, Player player);
     Player winner_;
     ConHexGraph conhex_graph_;
-    const std::array<int, 12> invalid_actions_ = {10, 16, 20, 24, 30, 32, 48, 50, 56, 60, 64, 70};
+    constexpr static std::array<int, 12> invalid_actions_ = {10, 16, 20, 24, 30, 32, 48, 50, 56, 60, 64, 70};
 };
 
 class ConHexEnvLoader : public BaseBoardEnvLoader<ConHexAction, ConHexEnv> {
