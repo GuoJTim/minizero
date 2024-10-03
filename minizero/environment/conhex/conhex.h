@@ -3,6 +3,7 @@
 #include "base_env.h"
 #include "configuration.h"
 #include "conhex_graph.h"
+#include <bitset>
 #include <set>
 #include <string>
 #include <vector>
@@ -39,10 +40,8 @@ public:
 
 private:
     bool isPlaceable(int table_id) const;
-    Player updateWinner(int action_id, Player player);
-    Player winner_;
     ConHexGraph conhex_graph_;
-    constexpr static std::array<int, 12> invalid_actions_ = {10, 16, 20, 24, 30, 32, 48, 50, 56, 60, 64, 70};
+    std::bitset<81> invalid_actions_;
 };
 
 class ConHexEnvLoader : public BaseBoardEnvLoader<ConHexAction, ConHexEnv> {

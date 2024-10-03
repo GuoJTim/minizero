@@ -1,5 +1,5 @@
-#ifndef MINIZERO_ENVIRONMENT_CONHEX_CONHEX_GRAPH_FLAG_H_
-#define MINIZERO_ENVIRONMENT_CONHEX_CONHEX_GRAPH_FLAG_H_
+#pragma once
+
 #include <set>
 #include <string>
 #include <utility>
@@ -14,6 +14,7 @@ enum class ConHexGraphEdgeFlag {
     LEFT = 0x4,
     BOTTOM = 0x8,
 };
+
 inline ConHexGraphEdgeFlag operator|(ConHexGraphEdgeFlag a, ConHexGraphEdgeFlag b)
 {
     return static_cast<ConHexGraphEdgeFlag>(static_cast<uint64_t>(a) | static_cast<uint64_t>(b));
@@ -49,4 +50,3 @@ inline bool operator==(ConHexGraphCellType a, int b)
 }
 
 } // namespace minizero::env::conhex
-#endif // MINIZERO_ENVIRONMENT_CONHEX_CONHEX_GRAPH_FLAG_H_

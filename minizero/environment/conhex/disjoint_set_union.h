@@ -1,5 +1,5 @@
-#ifndef MINIZERO_ENVIRONMENT_CONHEX_DISJOINT_SET_UNION_H_
-#define MINIZERO_ENVIRONMENT_CONHEX_DISJOINT_SET_UNION_H_
+#pragma once
+
 #include "base_env.h"
 #include <set>
 #include <string>
@@ -22,4 +22,3 @@ private:
 };
 
 } // namespace minizero::env::conhex
-#endif // MINIZERO_ENVIRONMENT_CONHEX_DISJOINT_SET_UNION_H_

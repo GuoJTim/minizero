@@ -10,46 +10,18 @@ ConHexGraphCell::ConHexGraphCell(int cell_id, ConHexGraphCellType cell_type)
     cell_id_ = cell_id;
     capture_player_ = Player::kPlayerNone; // default player
 }
-void ConHexGraphCell::initHole(std::vector<int>& holes)
+
+void ConHexGraphCell::placeStone(int hole, Player player)
 {
-    for (int& hole : holes) {
-        holes_.push_back(std::make_pair(hole, Player::kPlayerNone));
-    }
-}
+    holes_.get(player).set(hole);
+    ++captured_count_.get(player);
 
-void ConHexGraphCell::placeStone(int hole, Player player) // who capture this
-{
-    for (int idx = 0; idx < static_cast<int>(holes_.size()); ++idx) {
-        if (holes_[idx].first == hole && holes_[idx].second == Player::kPlayerNone) {
-            holes_[idx].second = player;
-        }
-    }
-    if (capture_player_ != Player::kPlayerNone) return; // if already captured early return
+    if (capture_player_ != Player::kPlayerNone) { return; } // if already captured early return
 
-    int player1_captured_count = 0;
-    int player2_captured_count = 0;
-
-    for (int idx = 0; idx < static_cast<int>(holes_.size()); ++idx) {
-        if (holes_[idx].second == Player::kPlayer1) player1_captured_count++;
-        if (holes_[idx].second == Player::kPlayer2) player2_captured_count++;
-    }
-
-    if (cell_type_ == ConHexGraphCellType::OUTER) {
-        // OUTER = 3 holes , first player get 2 holes win the cell
-        if (player1_captured_count == 2) capture_player_ = Player::kPlayer1;
-        if (player2_captured_count == 2) capture_player_ = Player::kPlayer2;
-    }
-
-    if (cell_type_ == ConHexGraphCellType::INNER) {
-        // OUTER = 6 holes , first player get 3 holes win the cell
-        if (player1_captured_count == 3) capture_player_ = Player::kPlayer1;
-        if (player2_captured_count == 3) capture_player_ = Player::kPlayer2;
-    }
-
-    if (cell_type_ == ConHexGraphCellType::CENTER) {
-        // CENTER = 5 holes , first player get 3 holes win the cell
-        if (player1_captured_count == 3) capture_player_ = Player::kPlayer1;
-        if (player2_captured_count == 3) capture_player_ = Player::kPlayer2;
+    if ((cell_type_ == ConHexGraphCellType::OUTER && captured_count_.get(player) == 2) ||
+        (cell_type_ == ConHexGraphCellType::INNER && captured_count_.get(player) == 3) ||
+        (cell_type_ == ConHexGraphCellType::CENTER && captured_count_.get(player) == 3)) {
+        capture_player_ = player;
     }
 }
 
@@ -70,9 +42,10 @@ int ConHexGraphCell::getCellId()
 
 void ConHexGraphCell::reset()
 {
-    for (int idx = 0; idx < static_cast<int>(holes_.size()); ++idx) {
-        holes_[idx].second = Player::kPlayerNone;
-    }
+    holes_.get(Player::kPlayer1).reset();
+    holes_.get(Player::kPlayer2).reset();
+    captured_count_.get(Player::kPlayer1) = 0;
+    captured_count_.get(Player::kPlayer2) = 0;
     capture_player_ = Player::kPlayerNone;
 }
 

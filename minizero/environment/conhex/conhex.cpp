@@ -12,12 +12,24 @@ using namespace minizero::utils;
 
 ConHexEnv::ConHexEnv() : BaseBoardEnv<ConHexAction>(kConHexBoardSize), conhex_graph_(kConHexBoardSize)
 {
+    invalid_actions_.set(10);
+    invalid_actions_.set(16);
+    invalid_actions_.set(20);
+    invalid_actions_.set(24);
+    invalid_actions_.set(30);
+    invalid_actions_.set(32);
+    invalid_actions_.set(48);
+    invalid_actions_.set(50);
+    invalid_actions_.set(56);
+    invalid_actions_.set(60);
+    invalid_actions_.set(64);
+    invalid_actions_.set(70);
     reset();
 }
+
 void ConHexEnv::reset()
 {
     // reset board
-    winner_ = Player::kPlayerNone;
     turn_ = Player::kPlayer1;
     actions_.clear();
     conhex_graph_.reset();
@@ -48,14 +60,9 @@ bool ConHexEnv::act(const ConHexAction& action)
         }
     }
     actions_.push_back(action);
-    winner_ = updateWinner(action_id, action.getPlayer());
+    conhex_graph_.placeStone(action_id, action.getPlayer());
     turn_ = action.nextPlayer();
     return true;
-}
-Player ConHexEnv::updateWinner(int action_id, Player player)
-{
-    conhex_graph_.placeStone(action_id, player);
-    return conhex_graph_.checkWinner();
 }
 
 bool ConHexEnv::act(const std::vector<std::string>& action_string_args)
@@ -74,24 +81,21 @@ std::vector<ConHexAction> ConHexEnv::getLegalActions() const
     return actions;
 }
 
-bool ConHexEnv::isPlaceable(int table_id) const
+bool ConHexEnv::isPlaceable(int action_id) const
 {
-    for (int invalid_action : invalid_actions_) {
-        if (table_id == invalid_action) return false;
-    }
+    if (invalid_actions_.test(action_id)) { return false; }
     return true;
 }
 
 bool ConHexEnv::isLegalAction(const ConHexAction& action) const
 {
-    int action_id = action.getActionID();
-    Player player = action.getPlayer();
-    if (!(action_id >= 0 && action_id < board_size_ * board_size_)) {
-        return false;
-    }
     assert(player == Player::kPlayer1 || player == Player::kPlayer2);
 
-    if (player != turn_) return false; // not player's turn
+    int action_id = action.getActionID();
+    Player player = action.getPlayer();
+    if (!(action_id >= 0 && action_id < board_size_ * board_size_)) { return false; }
+
+    if (player != turn_) { return false; } // not player's turn
 
     if (config::env_conhex_use_swap_rule && actions_.size() == 1) {
         // swap rule
@@ -107,7 +111,7 @@ bool ConHexEnv::isLegalAction(const ConHexAction& action) const
 
 bool ConHexEnv::isTerminal() const
 {
-    return winner_ != Player::kPlayerNone;
+    return conhex_graph_.checkWinner() != Player::kPlayerNone;
 }
 
 float ConHexEnv::getEvalScore(bool is_resign /*= false*/) const
@@ -115,7 +119,7 @@ float ConHexEnv::getEvalScore(bool is_resign /*= false*/) const
     if (is_resign) {
         return turn_ == Player::kPlayer1 ? -1.0f : 1.0f;
     }
-    switch (winner_) {
+    switch (conhex_graph_.checkWinner()) {
         case Player::kPlayer1: return 1.0f;
         case Player::kPlayer2: return -1.0f;
         default: return 0.0f;
@@ -130,26 +134,26 @@ std::vector<float> ConHexEnv::getFeatures(utils::Rotation rotation /*= utils::Ro
         4. Player1 turn
         5. Player2 turn
     */
-    std::vector<float> vFeatures;
+    std::vector<float> features;
     for (int channel = 0; channel < 6; ++channel) {
         for (int pos = 0; pos < board_size_ * board_size_; ++pos) {
             int rotation_pos = pos;
             if (channel == 0) {
-                vFeatures.push_back((conhex_graph_.getPlayerAtPos(rotation_pos) == turn_ ? 1.0f : 0.0f));
+                features.push_back((conhex_graph_.getPlayerAtPos(rotation_pos) == turn_ ? 1.0f : 0.0f));
             } else if (channel == 1) {
-                vFeatures.push_back((conhex_graph_.getPlayerAtPos(rotation_pos) == getNextPlayer(turn_, kConHexNumPlayer) ? 1.0f : 0.0f));
+                features.push_back((conhex_graph_.getPlayerAtPos(rotation_pos) == getNextPlayer(turn_, kConHexNumPlayer) ? 1.0f : 0.0f));
             } else if (channel == 2) {
-                vFeatures.push_back((conhex_graph_.isCellCapturedByPlayer(pos, turn_)) ? 1.0f : 0.0f);
+                features.push_back((conhex_graph_.isCellCapturedByPlayer(pos, turn_)) ? 1.0f : 0.0f);
             } else if (channel == 3) {
-                vFeatures.push_back((conhex_graph_.isCellCapturedByPlayer(pos, getNextPlayer(turn_, kConHexNumPlayer))) ? 1.0f : 0.0f);
+                features.push_back((conhex_graph_.isCellCapturedByPlayer(pos, getNextPlayer(turn_, kConHexNumPlayer))) ? 1.0f : 0.0f);
             } else if (channel == 4) {
-                vFeatures.push_back((turn_ == Player::kPlayer1 ? 1.0f : 0.0f));
+                features.push_back((turn_ == Player::kPlayer1 ? 1.0f : 0.0f));
             } else if (channel == 5) {
-                vFeatures.push_back((turn_ == Player::kPlayer2 ? 1.0f : 0.0f));
+                features.push_back((turn_ == Player::kPlayer2 ? 1.0f : 0.0f));
             }
         }
     }
-    return vFeatures;
+    return features;
 }
 
 std::vector<float> ConHexEnv::getActionFeatures(const ConHexAction& action, utils::Rotation rotation /*= utils::Rotation::kRotationNone*/) const

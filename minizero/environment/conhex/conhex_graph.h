@@ -1,5 +1,5 @@
-#ifndef MINIZERO_ENVIRONMENT_CONHEX_CONHEX_GRAPH_H_
-#define MINIZERO_ENVIRONMENT_CONHEX_CONHEX_GRAPH_H_
+#pragma once
+
 #include "base_env.h"
 #include "conhex_graph_cell.h"
 #include "conhex_graph_flag.h"
@@ -18,7 +18,7 @@ public:
     bool isCellCapturedByPlayer(int cell_id, Player player) const;
     void placeStone(int hole_idx, Player player);
     Player getPlayerAtPos(int hole_idx) const;
-    Player checkWinner() const;
+    inline Player checkWinner() const { return winner_; }
     void reset();
     std::string toString() const;
 
@@ -30,10 +30,9 @@ private:
     std::vector<std::vector<int>> hole_to_cell_map_; // hole_idx* -> cell_id, on same hole id may have many cell
     std::vector<std::set<int>> cell_adjacency_list_; // cell_id -> cell_id* , adj list
 
-    std::vector<ConHexGraphCell> cell_list_;
-    std::vector<Player> board_;
+    std::vector<ConHexGraphCell> cells_;
+    std::vector<Player> holes_;
     Player winner_;
-    int cell_id_cnt_;
 
     const int board_size_;
     const int top_id_ = board_size_ * board_size_;
@@ -43,4 +42,3 @@ private:
 };
 
 } // namespace minizero::env::conhex
-#endif // MINIZERO_ENVIRONMENT_CONHEX_CONHEX_GRAPH_H_
